@@ -4,10 +4,17 @@ import authRoutes from "./src/routes/authRoutes";
 import eventRoutes from "./src/routes/eventRoutes";
 import connectDB from "./src/config/db";
 import dotenv from "dotenv";
+import cors from "cors";
+
+const app = express();
+
+app.use(cors({
+  origin: "http://localhost:5173",  
+  credentials: true                 
+}));
 
 dotenv.config();
 
-const app = express();
 app.use(express.json());
 
 connectDB();

@@ -2,10 +2,10 @@ import bcrypt from "bcrypt";
 import User from "../models/user";
 import type { Request, Response } from "express";
 
-export const registerUser = async (req:Request, res:Response) => {
+export const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body;
-    
+
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         status: "fail",
@@ -19,7 +19,7 @@ export const registerUser = async (req:Request, res:Response) => {
     if (existingUser) {
       return res.status(400).json({
         status: "fail",
-        error:{
+        error: {
           message: "User already registered",
         },
       });
@@ -36,33 +36,37 @@ export const registerUser = async (req:Request, res:Response) => {
 
     res.status(201).json({
       status: "Success",
-      data:{
+      data: {
         message: "User registered successfully",
         user: {
           id: user._id,
           name: user.name,
           email: user.email,
-          role:user.role,
+          role: user.role,
         },
-      error:null,  
-      }
+        error: null,
+      },
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       status: "fail",
-      error:{
+      error: {
         message: "Error registering user",
       },
     });
   }
 };
 
-export const loginUser = async (req:Request, res:Response) => {
+export const loginUser = async (req: Request, res: Response) => {
   try {
+    console.log("Body: ", req.body);
     const { email, password } = req.body;
-    
+    console.log("email: ", req.body.email);
+    console.log("password: ", req.body.password);
+
     if (!email || !password) {
+      console.log("Either missing?");
       return res.status(400).json({
         status: "fail",
         error: {
@@ -72,10 +76,11 @@ export const loginUser = async (req:Request, res:Response) => {
     }
 
     const user = await User.findOne({ email });
+    console.log("user: ", user);
     if (!user) {
       return res.status(400).json({
         status: "fail",
-        error:{
+        error: {
           message: "user not found",
         },
       });
@@ -85,9 +90,9 @@ export const loginUser = async (req:Request, res:Response) => {
     if (!isMatch) {
       return res.status(400).json({
         status: "fail",
-        error:{
+        error: {
           message: "invalid credentials",
-        }
+        },
       });
     }
 
@@ -101,32 +106,32 @@ export const loginUser = async (req:Request, res:Response) => {
       else console.log("Session saved");
     });
 
-    res.status(400).json({
+    res.status(200).json({
       status: "success",
-      data:{
+      data: {
         message: "Login successful",
         user: {
           id: user._id,
-          role:user.role,
+          role: user.role,
         },
       },
     });
   } catch (error) {
     res.status(500).json({
       status: "fail",
-      error:{
+      error: {
         message: "Error in login",
       },
     });
   }
 };
 
-export const logoutUser = (req:Request, res:Response) => {
+export const logoutUser = (req: Request, res: Response) => {
   console.log("logout route hits");
   req.session.destroy(() => {
     res.json({
       status: "success",
-      data:{
+      data: {
         message: "logout successfully",
       },
     });

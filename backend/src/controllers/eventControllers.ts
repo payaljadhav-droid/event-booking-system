@@ -74,3 +74,37 @@ export const myEvents = async (req:Request, res:Response) => {
     });
   }
 };
+
+export const getEventById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const event = await Event.findById(id);
+
+    if (!event) {
+      return res.status(404).json({
+        status: "fail",
+        error: {
+          message: "Event not found",
+        },
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        event,
+      },
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+
+    res.status(500).json({
+      status: "fail",
+      error: {
+        message,
+      },
+    });
+  }
+};

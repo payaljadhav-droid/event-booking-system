@@ -22,6 +22,9 @@ const eventSchema = new mongoose.Schema(
     },
     available_tickets: {
       type: Number,
+      default: function (this: any): number {
+        return this.total_tickets;
+      },
     },
     organizer_id: {
       type: mongoose.Schema.Types.ObjectId,
