@@ -14,7 +14,7 @@ export default function EventBooking({ isOpen, onClose, event_id }: Props) {
     if (!tickets) return alert("Enter number of tickets");
 
     try {
-      const res = await fetch("http://localhost:8080/event/book", {
+      const res = await fetch("http://localhost:3000/book", {
         method: "POST",
         credentials: "include",
         headers: {

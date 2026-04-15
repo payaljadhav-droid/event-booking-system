@@ -1,18 +1,16 @@
-import express from "express";
+import { Hono } from "hono";
+import { createEvent, getAllEvents, myEvents, getEventById } from "../services/eventService";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { organizerOnly } from "../middlewares/roleMiddleware";
-import { createEvent, getAllEvents, myEvents, getEventById } from "../controllers/eventControllers"
-import { bookTicket, myBookings } from "../controllers/bookingControllers";
-import { cancelBooking } from "../controllers/cancelBookingController";
+import { AppEnv } from "../services/authService";
 
-const router = express.Router();
+const eventRoutes = new Hono<AppEnv>();
 
-router.post("/createEvent", authMiddleware, organizerOnly, createEvent);
-router.get("/", getAllEvents);
-router.get("/myevent", authMiddleware, myEvents);
-router.get("/mybookings", authMiddleware, myBookings);
-router.post("/book", authMiddleware, bookTicket);
-router.post("/cancelbook", authMiddleware, cancelBooking);
-router.get("/:id", getEventById);
 
-export default router;
+eventRoutes.get("/", getAllEvents);
+eventRoutes.get("/myevents", authMiddleware, organizerOnly, myEvents); 
+eventRoutes.post("/", authMiddleware, organizerOnly, createEvent);      
+eventRoutes.get("/:id", getEventById);                                  
+
+export default eventRoutes;
+

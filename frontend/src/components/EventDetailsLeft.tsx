@@ -11,7 +11,7 @@ export default function EventDetailsLeft({ event }: Props) {
 
       <div className="border-2 border-red-300 rounded-lg h-64 flex items-center justify-center mb-6 overflow-hidden">
         <img
-          src={`http://localhost:8080/${event.image}`}
+          src={`http://localhost:3000/${event.image}`}
           alt={event.title}
           className="w-full h-full object-cover"
         />

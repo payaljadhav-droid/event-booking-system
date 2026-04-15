@@ -8,7 +8,7 @@ type HeaderProps = {
 export default function Header({ search, setSearch }: HeaderProps) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = user.role;
+  const role = (user.role || "").toUpperCase();
   const name = user.name || "Guest";
   
   return (
@@ -33,7 +33,7 @@ export default function Header({ search, setSearch }: HeaderProps) {
         
         
         <nav className="flex items-center space-x-6 text-gray-700 font-medium">
-          {role === "user" ? (
+          {role === "USERS" ? (
               <span
                 onClick={() => navigate("/my-bookings")}
                 className="cursor-pointer hover:text-blue-500"
@@ -42,7 +42,7 @@ export default function Header({ search, setSearch }: HeaderProps) {
               </span>
             ) : (
               <span
-                onClick={() => navigate("/my-events")}
+                onClick={() => navigate("/my-event")}
                 className="cursor-pointer hover:text-blue-500"
               >
                 My Events

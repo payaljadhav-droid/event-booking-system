@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 type Event = {
-  _id: string;
+  id: string;
   title: string;
   date_time: string;
   image: string;
@@ -20,7 +20,7 @@ export default function UserDashboard() {
   const { data: events = [], isLoading, error } = useQuery<Event[]>({
     queryKey: ["events"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8080/event/");
+      const res = await fetch("http://localhost:3000/event");
       const json = await res.json();
       return json.data.events;
     },
@@ -94,12 +94,7 @@ export default function UserDashboard() {
             <div className="grid grid-cols-3 gap-4">
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event) => (
-                  <EventCard
-                    key={event._id}
-                    _id={event._id}
-                    title={event.title}
-                    date={event.date_time}
-                    image={event.image}
+                  <EventCard event={event}
                   />
                 ))
               ) : (

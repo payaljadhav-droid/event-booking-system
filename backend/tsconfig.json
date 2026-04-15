@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2023",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "ignoreDeprecations": "6.0",
+    // "ignoreDeprecations": "6.0",
     "rootDir": ".",
   },
   "include": ["./**/*.ts"],

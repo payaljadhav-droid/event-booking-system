@@ -1,0 +1,13 @@
+import { Hono } from "hono";
+import { bookTicket, myBookings } from "../services/bookEventService";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { AppEnv } from "../services/authService";
+import { cancelBooking } from "../services/cancelService";
+
+const bookingRoutes = new Hono<AppEnv>();
+
+bookingRoutes.post("/", authMiddleware, bookTicket);
+bookingRoutes.get("/my", authMiddleware, myBookings);
+bookingRoutes.post("/cancel", authMiddleware,cancelBooking );
+
+export default bookingRoutes;

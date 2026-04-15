@@ -15,7 +15,7 @@ export default function EventDetailsPage() {
   const { data: event, isLoading, error } = useQuery({
     queryKey: ["event", id],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8080/event/${id}`);
+      const res = await fetch(`http://localhost:3000/event/${id}`);
       const json = await res.json();
       return json.data.event;
     },
@@ -44,7 +44,7 @@ export default function EventDetailsPage() {
       <EventBooking
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
-        event_id={event._id}
+        event_id={event.id}
       />
     </>
   );

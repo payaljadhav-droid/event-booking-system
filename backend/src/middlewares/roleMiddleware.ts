@@ -1,13 +1,17 @@
-import type { Request, Response, NextFunction } from "express";
+import { Context, Next } from "hono";
+import { AppEnv } from "../services/authService";
 
-export const organizerOnly = async (req:Request, res:Response, next:NextFunction) => {
-  if (!req.user || req.user.role !== "organizer") {
-    return res.status(403).json({
+export const organizerOnly = async (c: Context<AppEnv>, next: Next) => {
+  const user = c.get("user");
+
+  if (!user || user.role !== "organizer") {
+    return c.json({
       status: "fail",
-      error:{
+      error: {
         message: "Organizers only",
       },
-    });
+    }, 403);
   }
-  next();
-}
+
+  await next();
+};

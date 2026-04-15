@@ -11,7 +11,7 @@ export default function FilterPanel({setFilter, location, setLocation}:Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [locationOpen, setLocationOpen] = useState<boolean>(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = user.role;
+  const role = (user.role || "").toUpperCase();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -76,7 +76,7 @@ export default function FilterPanel({setFilter, location, setLocation}:Props) {
             </div>
           )}
         </div>
-        {role == "organizer" ? (
+        {role == "ORGANIZER" ? (
           <div className="mt-20">
             <a href="/create-event" className="text-blue-500 hover:underline">
             Create your event

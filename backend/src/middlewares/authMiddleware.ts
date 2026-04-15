@@ -1,19 +1,21 @@
-import type { Request, Response, NextFunction } from "express";
+import { Context, Next } from "hono";
+import { AppEnv } from "../services/authService";
 
-export const authMiddleware = async (req:Request, res:Response, next: NextFunction) => {
-  
-  console.log("SESSION IN MIDDLEWARE:", req.session);
-  if (!req.session || !req.session.user) {
-    return res.status(401).json({
+export const authMiddleware = async (c: Context<AppEnv>, next: Next) => {
+
+  const session = c.get("session");
+  const user = session?.get("user");
+
+  if (!user) {
+    return c.json({
       status: "fail",
-      error:{
+      error: {
         message: "Unauthorized",
       },
-    });
+    }, 401);
   }
-  req.user = {
-      id: req.session.user.id,
-      role: req.session.user.role
-  };
-  next();
-}
+
+  c.set("user", user);
+
+  await next();
+};

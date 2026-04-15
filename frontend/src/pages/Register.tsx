@@ -15,7 +15,7 @@ export default function Login() {
     if (!name && !email && !password && !role) return;
     
       try {
-        const res = await fetch("http://localhost:8080/auth/registerUser", {
+        const res = await fetch("http://localhost:3000/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include", 

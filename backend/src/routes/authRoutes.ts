@@ -1,14 +1,21 @@
-import express from 'express';
-import {registerUser,loginUser,logoutUser} from "../controllers/authControllers";
+import { Hono } from "hono";
+import { registerUser, loginUser, logoutUser, AppEnv } from "../services/authService";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
-const router = express.Router();
+const authRoutes = new Hono<AppEnv>();
 
-router.post("/registerUser", registerUser);
-
-router.post("/login", loginUser);
-
-router.post("/logout", logoutUser);
-
-export default router;
+authRoutes.post("/register", registerUser);
+authRoutes.post("/login", loginUser);
+authRoutes.post("/logout", logoutUser);
 
 
+authRoutes.get("/me", authMiddleware, (c) => {
+  const user = c.get("user");
+
+  return c.json({
+    status: "success",
+    data: user,
+  });
+});
+
+export default authRoutes;

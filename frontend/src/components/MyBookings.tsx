@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Booking = {
-  _id: string;
+  id: string;
   tickets_booked: number;
-  event_id: {
+  event: {
     title: string;
     date_time: string;
     image?: string;
@@ -18,17 +18,18 @@ export default function MyBookings() {
   const { data: bookings, isLoading, error } = useQuery<Booking[]>({
     queryKey: ["myBookings"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8080/event/mybookings", {
+      const res = await fetch("http://localhost:3000/book/my", {
         credentials: "include",
       });
+
       const data = await res.json();
       return data.data.bookings;
     },
   });
-  
+
   const cancelMutation = useMutation({
     mutationFn: async (booking_id: string) => {
-      const res = await fetch("http://localhost:8080/event/cancelbook", {
+      const res = await fetch("http://localhost:3000/book/cancel", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,14 +48,14 @@ export default function MyBookings() {
     },
 
     onSuccess: (_, booking_id) => {
-      queryClient.setQueryData(["myBookings"], (old: any) =>
-        old?.filter((b: Booking) => b._id !== booking_id)
+      queryClient.setQueryData(["myBookings"], (old: Booking[] = []) =>
+        old.filter((b) => b.id !== booking_id)
       );
 
       setMessage("Booking cancelled successfully!");
-
       setTimeout(() => setMessage(""), 3000);
     },
+
     onError: (err: any) => {
       setMessage(err?.message || "Cancel failed");
       setTimeout(() => setMessage(""), 3000);
@@ -79,27 +80,23 @@ export default function MyBookings() {
           <p>No bookings found</p>
         ) : (
           bookings?.map((booking) => {
-            const event = booking.event_id;
+            const event = booking.event;
 
-            const formattedDate = new Date(event.date_time).toLocaleDateString(
-              "en-GB",
-              {
-                day: "numeric",
-                month: "short",
-              }
-            );
+            const dateObj = new Date(event.date_time);
 
-            const formattedTime = new Date(event.date_time).toLocaleTimeString(
-              [],
-              {
-                hour: "2-digit",
-                minute: "2-digit",
-              }
-            );
+            const formattedDate = dateObj.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+            });
+
+            const formattedTime = dateObj.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
             return (
               <div
-                key={booking._id}
+                key={booking.id}
                 className="border-2 border-gray-300 rounded-xl p-5 flex justify-between items-center shadow-sm"
               >
                 <div className="flex gap-6 items-center">
@@ -107,7 +104,7 @@ export default function MyBookings() {
                     <img
                       src={
                         event?.image
-                          ? `http://localhost:8080/${event.image}`
+                          ? `http://localhost:3000/${event.image}`
                           : "/placeholder.png"
                       }
                       alt={event?.title}
@@ -116,7 +113,9 @@ export default function MyBookings() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-medium mb-2">{event?.title}</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      {event?.title}
+                    </h3>
                     <p className="text-gray-600">
                       {formattedDate} | {formattedTime}
                     </p>
@@ -131,12 +130,16 @@ export default function MyBookings() {
                     const confirmCancel = window.confirm(
                       "Are you sure you want to cancel this booking?"
                     );
-                    if (confirmCancel) cancelMutation.mutate(booking._id);
+                    if (confirmCancel) {
+                      cancelMutation.mutate(booking.id);
+                    }
                   }}
                   disabled={cancelMutation.isPending}
                   className="text-gray-500 hover:text-red-500 transition"
                 >
-                  {cancelMutation.isPending ? "Cancelling..." : "Cancel Booking"}
+                  {cancelMutation.isPending
+                    ? "Cancelling..."
+                    : "Cancel Booking"}
                 </button>
               </div>
             );
