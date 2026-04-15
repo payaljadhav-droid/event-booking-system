@@ -6,20 +6,22 @@ type Props = {
 
 export default function EventDetailsLeft({ event }: Props) {
   return (
-    <div className="flex-1 p-6">
-      <h2 className="text-xl font-semibold mb-4">{event.title}</h2>
+    <div className="w-full bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+      <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
+        {event.title}
+      </h2>
 
-      <div className="border-2 border-red-300 rounded-lg h-64 flex items-center justify-center mb-6 overflow-hidden">
+      <div className="mt-4 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 h-56 sm:h-72 md:h-80 lg:h-[420px]">
         <img
-          src={`http://localhost:3000/${event.image}`}
+          src={event.image_url}
           alt={event.title}
           className="w-full h-full object-cover"
         />
       </div>
 
-      <div>
-        <h3 className="text-lg font-medium mb-2">About the Event</h3>
-        <hr className="mb-4" />
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold text-gray-900">About the Event</h3>
+        <hr className="my-4" />
 
         <p className="text-gray-600">{event.description}</p>
       </div>

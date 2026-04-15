@@ -20,31 +20,43 @@ export default function EventDetailsRight({ event, onBook }: Props) {
   const role = (user.role || "").toUpperCase();
 
   return (
-    <div className="w-80 bg-gray-100 p-6 rounded-lg flex flex-col justify-between">
-      <div className="space-y-4">
-        <p>📍 {event.location}</p>
-        <p>📅 {formattedDate}</p>
-        <p>🕒 {formattedTime}</p>
-        <p>🎟️ {event.available_tickets} seats left</p>
+    <div className="w-full bg-white border border-gray-200 p-4 md:p-6 rounded-xl flex flex-col justify-between">
+      <div className="space-y-3 text-gray-800">
+        <p className="flex gap-2">
+          <span className="shrink-0">📍</span>
+          <span className="min-w-0 break-words">{event.location}</span>
+        </p>
+        <p className="flex gap-2">
+          <span className="shrink-0">📅</span>
+          <span>{formattedDate}</span>
+        </p>
+        <p className="flex gap-2">
+          <span className="shrink-0">🕒</span>
+          <span>{formattedTime}</span>
+        </p>
+        <p className="flex gap-2">
+          <span className="shrink-0">🎟️</span>
+          <span>{event.available_tickets} seats left</span>
+        </p>
       </div>
       
       {role === "USERS" ? (
         <button
           onClick={onBook}
-          className="mt-6 border-2 border-green-500 text-green-600 py-2 rounded-full hover:bg-green-100 transition"
+          className="mt-6 border-2 border-green-500 text-green-700 py-2 rounded-full hover:bg-green-50 transition w-full"
         >
           Book Now
         </button>
       ) : (
         <div className="flex flex-col gap-3 mt-6 w-full">
           <button
-            className="border-2 border-green-500 text-green-600 py-2 rounded-full hover:bg-green-100 transition w-full"
+            className="border-2 border-green-500 text-green-700 py-2 rounded-full hover:bg-green-50 transition w-full"
           >
             Edit
           </button>
         
           <button
-            className="border-2  border-green-500 text-green-600 py-2 rounded-full hover:bg-red-100 transition w-full"
+            className="border-2 border-red-300 text-red-700 py-2 rounded-full hover:bg-red-50 transition w-full"
           >
             Cancel Event
           </button>

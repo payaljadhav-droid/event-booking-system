@@ -24,10 +24,7 @@ export default function CreateEvent() {
     setLoading(true);
 
     try {
-      
-      const date_time = `${date}T${time}`;
-
-      const res = await fetch("http://localhost:3000/event", {
+      const res = await fetch("http://localhost:3000/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -46,7 +43,7 @@ export default function CreateEvent() {
 
       if (res.ok) {
         alert("Event created successfully!");
-        navigate("/create-event", { replace: true });
+        navigate("/events/creating", { replace: true });
       } else {
         alert(data.message || "Failed to create event");
       }

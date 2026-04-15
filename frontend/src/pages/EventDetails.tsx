@@ -15,7 +15,7 @@ export default function EventDetailsPage() {
   const { data: event, isLoading, error } = useQuery({
     queryKey: ["event", id],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:3000/event/${id}`);
+      const res = await fetch(`http://localhost:3000/api/events/${id}`);
       const json = await res.json();
       return json.data.event;
     },
@@ -30,14 +30,20 @@ export default function EventDetailsPage() {
     <>
       <Header search={search} setSearch={setSearch} />
 
-      <div className="p-6 rounded-xl">
-        <div className="flex gap-6">
-          <EventDetailsLeft event={event} />
+      <div className="px-4 md:px-8 lg:px-16 py-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">
+            <div className="lg:col-span-8">
+              <EventDetailsLeft event={event} />
+            </div>
 
-          <EventDetailsRight
-            event={event}
-            onBook={() => setOpenModal(true)}
-          />
+            <div className="lg:col-span-4 lg:sticky lg:top-6">
+              <EventDetailsRight
+                event={event}
+                onBook={() => setOpenModal(true)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
