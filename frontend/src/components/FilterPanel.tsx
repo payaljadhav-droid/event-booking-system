@@ -78,7 +78,7 @@ export default function FilterPanel({setFilter, location, setLocation}:Props) {
         </div>
         {role == "ORGANIZER" ? (
           <div className="mt-20">
-            <a href="/create-event" className="text-blue-500 hover:underline">
+            <a href="/organizer/events/new" className="text-blue-500 hover:underline">
             Create your event
             </a>
           </div>

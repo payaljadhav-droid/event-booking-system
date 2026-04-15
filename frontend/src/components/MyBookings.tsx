@@ -7,7 +7,7 @@ type Booking = {
   event: {
     title: string;
     date_time: string;
-    image?: string;
+    image_url?: string;
   };
 };
 
@@ -18,7 +18,7 @@ export default function MyBookings() {
   const { data: bookings, isLoading, error } = useQuery<Booking[]>({
     queryKey: ["myBookings"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/book/my", {
+      const res = await fetch("http://localhost:3000/api/bookings/mine", {
         credentials: "include",
       });
 
@@ -29,7 +29,7 @@ export default function MyBookings() {
 
   const cancelMutation = useMutation({
     mutationFn: async (booking_id: string) => {
-      const res = await fetch("http://localhost:3000/book/cancel", {
+      const res = await fetch("http://localhost:3000/api/bookings/cancellation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,9 +103,7 @@ export default function MyBookings() {
                   <div className="w-28 h-28 rounded-lg overflow-hidden bg-gray-100">
                     <img
                       src={
-                        event?.image
-                          ? `http://localhost:3000/${event.image}`
-                          : "/placeholder.png"
+                        event?.image_url
                       }
                       alt={event?.title}
                       className="w-full h-full object-cover"

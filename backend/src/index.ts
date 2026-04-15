@@ -26,7 +26,14 @@ app.use(
   sessionMiddleware({
     store: new MemoryStore(),
     encryptionKey: "this-is-a-very-long-secret-key-at-least-32-chars",
+
+    cookieOptions: {
+      maxAge: 60 * 60, 
+      httpOnly: true,
+      secure: false, 
+    },
   }),
+  
 );
 
 app.get("/", async (c) => {
@@ -40,9 +47,9 @@ app.get("/users", async (c) => {
   return c.json(users);
 });
 
-app.route("/auth", authRoutes);
-app.route("/event", eventRoutes);
-app.route("/book", bookingRoutes);
+app.route("/api/auth", authRoutes);
+app.route("/api/events", eventRoutes);
+app.route("/api/bookings", bookingRoutes);
 
 serve(
   {

@@ -14,7 +14,7 @@ export default function MyEvents() {
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ["myEvents"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/event/myevents", {
+      const res = await fetch("http://localhost:3000/api/events/mine", {
         credentials: "include",
       });
 

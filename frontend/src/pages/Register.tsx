@@ -15,7 +15,7 @@ export default function Login() {
     if (!name && !email && !password && !role) return;
     
       try {
-        const res = await fetch("http://localhost:3000/auth/register", {
+        const res = await fetch("http://localhost:3000/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include", 
@@ -26,7 +26,8 @@ export default function Login() {
     
         if (res.ok) {
           console.log("User register successful", data);
-          navigate("/"); 
+          alert("User registered successfully");
+          navigate("/login"); 
         } else {
           
           console.log("registration failed:", data.message);
@@ -92,7 +93,7 @@ export default function Login() {
                 </button>
                 <p className="mt-2">
                   Already have an account? 
-                  <a href="/" className="text-blue-500 hover:underline ml-1">Sign In</a>
+                  <a href="/login" className="text-blue-500 hover:underline ml-1">Sign In</a>
                 </p>
               </div>
             </form>

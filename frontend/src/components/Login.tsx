@@ -15,7 +15,7 @@ export default function Login() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/auth/login", {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -46,12 +46,13 @@ export default function Login() {
           id: user.id,
           role: role,
           name : user.name,
+          email: user.email,
         })
       );
 
       console.log("Stored user:", { id: user.id, role }); 
 
-      navigate("/user-dashboard");
+      navigate("/dashboard");
       
     } catch (err) {
       console.error("Error logging in:", err);

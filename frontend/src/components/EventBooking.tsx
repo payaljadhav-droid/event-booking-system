@@ -14,7 +14,7 @@ export default function EventBooking({ isOpen, onClose, event_id }: Props) {
     if (!tickets) return alert("Enter number of tickets");
 
     try {
-      const res = await fetch("http://localhost:3000/book", {
+      const res = await fetch("http://localhost:3000/api/bookings", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -89,7 +89,7 @@ export default function EventBooking({ isOpen, onClose, event_id }: Props) {
               Booking Successful!!!!!
               </h2>
               
-            <a href="/my-bookings" className="text-sm text-gray-500 cursor-pointer hover:underline">View details</a>
+            <a href="/bookings/me" className="text-sm text-gray-500 cursor-pointer hover:underline">View details</a>
 
           </div>
         )}

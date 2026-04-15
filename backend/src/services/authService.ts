@@ -142,6 +142,8 @@ export const loginUser = async (c: Context<AppEnv>) => {
         user: {
           id: user.id,
           role: user.role,
+          name: user.name,
+          email: user.email,
         },
       },
     });

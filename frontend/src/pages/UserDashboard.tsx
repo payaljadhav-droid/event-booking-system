@@ -20,7 +20,7 @@ export default function UserDashboard() {
   const { data: events = [], isLoading, error } = useQuery<Event[]>({
     queryKey: ["events"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/event");
+      const res = await fetch("http://localhost:3000/api/events");
       const json = await res.json();
       return json.data.events;
     },
@@ -94,7 +94,7 @@ export default function UserDashboard() {
             <div className="grid grid-cols-3 gap-4">
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event) => (
-                  <EventCard event={event}
+                  <EventCard key={event.id} event={event}
                   />
                 ))
               ) : (

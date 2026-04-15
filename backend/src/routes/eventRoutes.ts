@@ -8,7 +8,7 @@ const eventRoutes = new Hono<AppEnv>();
 
 
 eventRoutes.get("/", getAllEvents);
-eventRoutes.get("/myevents", authMiddleware, organizerOnly, myEvents); 
+eventRoutes.get("/mine", authMiddleware, organizerOnly, myEvents); 
 eventRoutes.post("/", authMiddleware, organizerOnly, createEvent);      
 eventRoutes.get("/:id", getEventById);                                  
 
