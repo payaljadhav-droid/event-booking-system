@@ -39,6 +39,8 @@ model Event {
   organizer         User     @relation("UserEvents", fields: [organizer_id], references: [id])
 
   bookings          Booking[]
+  status            String   @default("ACTIVE")
+  cancelled_at      DateTime?
 
   created_at        DateTime @default(now())
 }

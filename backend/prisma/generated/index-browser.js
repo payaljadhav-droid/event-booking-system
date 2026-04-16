@@ -140,6 +140,8 @@ exports.Prisma.EventScalarFieldEnum = {
   total_tickets: 'total_tickets',
   available_tickets: 'available_tickets',
   organizer_id: 'organizer_id',
+  status: 'status',
+  cancelled_at: 'cancelled_at',
   created_at: 'created_at'
 };
 

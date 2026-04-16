@@ -60,6 +60,16 @@ export const bookTicket = async (c: Context<AppEnv>) => {
       );
     }
 
+    if (event.status === "CANCELLED") {
+      return c.json(
+        {
+          status: "fail",
+          error: { message: "Event is cancelled" },
+        },
+        400
+      );
+    }
+
     let availableTickets = event.available_tickets;
 
     if (availableTickets == null) {

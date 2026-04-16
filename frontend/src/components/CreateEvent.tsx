@@ -1,63 +1,131 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function CreateEvent() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");          
-  const [time, setTime] = useState("");          
-  const [image, setImage] = useState("");        
-  const [total_tickets, setTotalTickets] = useState("");
+type Props = {
+  mode?: "create" | "edit";
+};
 
-  const [loading, setLoading] = useState(false);
+export default function CreateEvent({ mode = "create" }: Props) {
+  const { id } = useParams();
+
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [image, setImage] = useState("");
+  const [total_tickets, setTotalTickets] = useState("");
 
-    if (!title || !description || !location || !date || !time || !total_tickets) {
-      alert("Please fill in all fields");
-      return;
+  
+  const { data, isLoading } = useQuery({
+    queryKey: ["event", id],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:3000/api/events/${id}`, {
+        credentials: "include",
+      });
+      const json = await res.json();
+      return json.data?.event ?? json;
+    },
+    enabled: mode === "edit" && !!id,
+  });
+
+  
+  useEffect(() => {
+    if (data) {
+      setTitle(data.title || "");
+      setDescription(data.description || "");
+      setEventLocation(data.location || "");
+      setImage(data.image_url || "");
+      setTotalTickets(String(data.total_tickets ?? ""));
+
+      const dt = data.date_time ? new Date(data.date_time) : null;
+      if (dt && !Number.isNaN(dt.getTime())) {
+        const yyyy = dt.getFullYear();
+        const mm = String(dt.getMonth() + 1).padStart(2, "0");
+        const dd = String(dt.getDate()).padStart(2, "0");
+        setDate(`${yyyy}-${mm}-${dd}`);
+
+        const hh = String(dt.getHours()).padStart(2, "0");
+        const min = String(dt.getMinutes()).padStart(2, "0");
+        setTime(`${hh}:${min}`);
+      } else {
+        setDate("");
+        setTime("");
+      }
     }
+  }, [data]);
 
-    setLoading(true);
+  
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const url =
+        mode === "edit"
+          ? `http://localhost:3000/api/events/${id}`
+          : "http://localhost:3000/api/events";
 
-    try {
-      const res = await fetch("http://localhost:3000/api/events", {
-        method: "POST",
+      const method = mode === "edit" ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           title,
-            description,
-            location,
-            date,              
-            time,              
-            total_tickets: Number(total_tickets), 
-            image_url: image,  
+          description,
+          location: eventLocation,
+          date,
+          time,
+          total_tickets: Number(total_tickets),
+          image_url: image,
         }),
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Something went wrong");
 
-      if (res.ok) {
-        alert("Event created successfully!");
-        navigate("/events/creating", { replace: true });
-      } else {
-        alert(data.message || "Failed to create event");
-      }
-    } catch (err) {
-      console.error("Error creating event:", err);
-      alert("Something went wrong. Try again later.");
-    } finally {
-      setLoading(false);
+      return data;
+    },
+
+    onSuccess: () => {
+      alert(mode === "edit" ? "Event updated!" : "Event created!");
+
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["myEvents"] });
+
+      navigate("/organizer/events");
+    },
+
+    onError: (err: any) => {
+      alert(err.message);
+    },
+  });
+
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title || !description || !eventLocation || !date || !time || !total_tickets) {
+      alert("Please fill in all fields");
+      return;
     }
+
+    mutation.mutate();
   };
+
+  
+  if (mode === "edit" && isLoading) {
+    return <p className="text-center mt-10">Loading event...</p>;
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Create Your Event</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {mode === "edit" ? "Edit Event" : "Create Your Event"}
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -79,8 +147,8 @@ export default function CreateEvent() {
         <input
           type="text"
           placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          value={eventLocation}
+          onChange={(e) => setEventLocation(e.target.value)}
           className="w-full p-2 border rounded-lg"
         />
 
@@ -117,12 +185,17 @@ export default function CreateEvent() {
 
         <button
           type="submit"
-          disabled={loading}
-          className={`w-full ${
-            loading ? "bg-gray-400" : "bg-blue-500"
-          } text-white py-2 rounded-lg`}
+          disabled={mutation.isPending}
+          className={`w-full ${mutation.isPending ? "bg-gray-400" : "bg-blue-500"
+            } text-white py-2 rounded-lg`}
         >
-          {loading ? "Creating..." : "Create Event"}
+          {mutation.isPending
+            ? mode === "edit"
+              ? "Updating..."
+              : "Creating..."
+            : mode === "edit"
+              ? "Save Updates"
+              : "Create Event"}
         </button>
       </form>
     </div>

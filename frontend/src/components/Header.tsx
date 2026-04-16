@@ -10,7 +10,9 @@ export default function Header({ search, setSearch }: HeaderProps) {
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = (user.role || "").toUpperCase();
+  const role = user.role;
+  console.log("USER OBJECT:", user);
+  console.log("ROLE:", role);
   const name = user.name || "Guest";
 
   const [openMenu, setOpenMenu] = useState(false);
@@ -59,7 +61,7 @@ export default function Header({ search, setSearch }: HeaderProps) {
         <nav className="flex items-center space-x-6 text-gray-700 font-medium">
           
           
-          {role === "USERS" ? (
+          {role === "USER" ? (
             <span
               onClick={() => navigate("/bookings/me")}
               className="cursor-pointer hover:text-blue-500"

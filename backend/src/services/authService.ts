@@ -2,6 +2,8 @@ import { Context } from "hono";
 import bcrypt from "bcrypt";
 import { prisma } from "../db/prisma";
 import { Session } from "hono-sessions";
+import { registerSchema, loginSchema } from "../schemas/auth.schema";
+
 
 type SessionData = {
   user: {
@@ -22,26 +24,27 @@ export type AppEnv = {
 
 export const registerUser = async (c: Context<AppEnv>) => {
   try {
-    console.log("user registered 1");
-    const { name, email, password, role } = await c.req.json();
-    console.log("user registered 2");
+    const body = await c.req.json();
 
-    if (!name || !email || !password || !role) {
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
       return c.json(
         {
           status: "fail",
-          error: { message: "Missing required fields" },
+          error: {
+            message: "Validation failed",
+            details: parsed.error.flatten(),
+          },
         },
-        400,
+        400
       );
     }
-    console.log("user registered 3");
+
+    const { name, email, password, role } = parsed.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
-    console.log("user registered 4");
     if (existingUser) {
-      console.log("user registered 5");
       return c.json(
         {
           status: "fail",
@@ -51,9 +54,7 @@ export const registerUser = async (c: Context<AppEnv>) => {
       );
     }
 
-    console.log("user registered 6");
     const hashPassword = await bcrypt.hash(password, 10);
-    console.log("user registered 7");
 
     const user = await prisma.user.create({
       data: {
@@ -64,7 +65,6 @@ export const registerUser = async (c: Context<AppEnv>) => {
       },
     });
 
-    console.log("user registered 8");
     return c.json(
       {
         status: "success",
@@ -92,17 +92,23 @@ export const registerUser = async (c: Context<AppEnv>) => {
 
 export const loginUser = async (c: Context<AppEnv>) => {
   try {
-    const { email, password } = await c.req.json();
+    const body = await c.req.json();
 
-    if (!email || !password) {
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
       return c.json(
         {
           status: "fail",
-          error: { message: "Missing fields" },
+          error: {
+            message: "Validation failed",
+            details: parsed.error.flatten(),
+          },
         },
-        400,
+        400
       );
     }
+
+    const { email, password } = parsed.data;
 
     const user = await prisma.user.findUnique({ where: { email } });
 

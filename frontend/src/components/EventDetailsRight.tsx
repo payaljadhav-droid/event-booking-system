@@ -16,16 +16,13 @@ export default function EventDetailsRight({ event, onBook }: Props) {
     minute: "2-digit",
   });
   
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = (user.role || "").toUpperCase();
-
   return (
     <div className="w-full bg-white border border-gray-200 p-4 md:p-6 rounded-xl flex flex-col justify-between">
       <div className="space-y-3 text-gray-800">
         <p className="flex gap-2">
           <span className="shrink-0">📍</span>
           <span className="min-w-0 break-words">{event.location}</span>
-        </p>
+        </p >
         <p className="flex gap-2">
           <span className="shrink-0">📅</span>
           <span>{formattedDate}</span>
@@ -40,28 +37,12 @@ export default function EventDetailsRight({ event, onBook }: Props) {
         </p>
       </div>
       
-      {role === "USERS" ? (
         <button
           onClick={onBook}
           className="mt-6 border-2 border-green-500 text-green-700 py-2 rounded-full hover:bg-green-50 transition w-full"
         >
           Book Now
         </button>
-      ) : (
-        <div className="flex flex-col gap-3 mt-6 w-full">
-          <button
-            className="border-2 border-green-500 text-green-700 py-2 rounded-full hover:bg-green-50 transition w-full"
-          >
-            Edit
-          </button>
-        
-          <button
-            className="border-2 border-red-300 text-red-700 py-2 rounded-full hover:bg-red-50 transition w-full"
-          >
-            Cancel Event
-          </button>
-        </div>
-         )}   
       
     </div>
   );

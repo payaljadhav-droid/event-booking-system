@@ -23,8 +23,9 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/bookings/me" element={<MyBookingPage />} />
-          <Route path="/organizer/events/new" element={<CreateEventPage />} />
+          <Route path="/organizer/events/new" element={<CreateEventPage mode="create" />} />
           <Route path="/organizer/events" element={<MyEvent />} />
+          <Route path="/events/:id/edit" element={<CreateEventPage mode="edit" />} />
         </Route>
       </Routes>
     </>

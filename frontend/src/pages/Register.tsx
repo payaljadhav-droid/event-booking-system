@@ -30,8 +30,10 @@ export default function Login() {
           navigate("/login"); 
         } else {
           
-          console.log("registration failed:", data.message);
-          alert(data.message || "Registration failed");
+          const message =
+            data?.error?.message || data?.message || "Registration failed";
+          console.log("registration failed:", message);
+          alert(message);
         }
       } catch (err) {
         console.error("Error registering in:", err);
@@ -82,8 +84,8 @@ export default function Login() {
                   className="w-80 mt-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="">Select your role</option>
-                  <option value="user">User</option>
-                  <option value="organizer">Organizer</option>
+                  <option value="user">user</option>
+                  <option value="organizer">organizer</option>
                 </select>
               </div>
               <div className="flex flex-col justify-center items-center">

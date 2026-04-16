@@ -2296,6 +2296,8 @@ export namespace Prisma {
     total_tickets: number | null
     available_tickets: number | null
     organizer_id: string | null
+    status: string | null
+    cancelled_at: Date | null
     created_at: Date | null
   }
 
@@ -2309,6 +2311,8 @@ export namespace Prisma {
     total_tickets: number | null
     available_tickets: number | null
     organizer_id: string | null
+    status: string | null
+    cancelled_at: Date | null
     created_at: Date | null
   }
 
@@ -2322,6 +2326,8 @@ export namespace Prisma {
     total_tickets: number
     available_tickets: number
     organizer_id: number
+    status: number
+    cancelled_at: number
     created_at: number
     _all: number
   }
@@ -2347,6 +2353,8 @@ export namespace Prisma {
     total_tickets?: true
     available_tickets?: true
     organizer_id?: true
+    status?: true
+    cancelled_at?: true
     created_at?: true
   }
 
@@ -2360,6 +2368,8 @@ export namespace Prisma {
     total_tickets?: true
     available_tickets?: true
     organizer_id?: true
+    status?: true
+    cancelled_at?: true
     created_at?: true
   }
 
@@ -2373,6 +2383,8 @@ export namespace Prisma {
     total_tickets?: true
     available_tickets?: true
     organizer_id?: true
+    status?: true
+    cancelled_at?: true
     created_at?: true
     _all?: true
   }
@@ -2473,6 +2485,8 @@ export namespace Prisma {
     total_tickets: number
     available_tickets: number
     organizer_id: string
+    status: string
+    cancelled_at: Date | null
     created_at: Date
     _count: EventCountAggregateOutputType | null
     _avg: EventAvgAggregateOutputType | null
@@ -2505,6 +2519,8 @@ export namespace Prisma {
     total_tickets?: boolean
     available_tickets?: boolean
     organizer_id?: boolean
+    status?: boolean
+    cancelled_at?: boolean
     created_at?: boolean
     organizer?: boolean | UserDefaultArgs<ExtArgs>
     bookings?: boolean | Event$bookingsArgs<ExtArgs>
@@ -2521,6 +2537,8 @@ export namespace Prisma {
     total_tickets?: boolean
     available_tickets?: boolean
     organizer_id?: boolean
+    status?: boolean
+    cancelled_at?: boolean
     created_at?: boolean
     organizer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["event"]>
@@ -2535,6 +2553,8 @@ export namespace Prisma {
     total_tickets?: boolean
     available_tickets?: boolean
     organizer_id?: boolean
+    status?: boolean
+    cancelled_at?: boolean
     created_at?: boolean
     organizer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["event"]>
@@ -2549,10 +2569,12 @@ export namespace Prisma {
     total_tickets?: boolean
     available_tickets?: boolean
     organizer_id?: boolean
+    status?: boolean
+    cancelled_at?: boolean
     created_at?: boolean
   }
 
-  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "image_url" | "location" | "date_time" | "total_tickets" | "available_tickets" | "organizer_id" | "created_at", ExtArgs["result"]["event"]>
+  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "image_url" | "location" | "date_time" | "total_tickets" | "available_tickets" | "organizer_id" | "status" | "cancelled_at" | "created_at", ExtArgs["result"]["event"]>
   export type EventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organizer?: boolean | UserDefaultArgs<ExtArgs>
     bookings?: boolean | Event$bookingsArgs<ExtArgs>
@@ -2581,6 +2603,8 @@ export namespace Prisma {
       total_tickets: number
       available_tickets: number
       organizer_id: string
+      status: string
+      cancelled_at: Date | null
       created_at: Date
     }, ExtArgs["result"]["event"]>
     composites: {}
@@ -3016,6 +3040,8 @@ export namespace Prisma {
     readonly total_tickets: FieldRef<"Event", 'Int'>
     readonly available_tickets: FieldRef<"Event", 'Int'>
     readonly organizer_id: FieldRef<"Event", 'String'>
+    readonly status: FieldRef<"Event", 'String'>
+    readonly cancelled_at: FieldRef<"Event", 'DateTime'>
     readonly created_at: FieldRef<"Event", 'DateTime'>
   }
     
@@ -4628,6 +4654,8 @@ export namespace Prisma {
     total_tickets: 'total_tickets',
     available_tickets: 'available_tickets',
     organizer_id: 'organizer_id',
+    status: 'status',
+    cancelled_at: 'cancelled_at',
     created_at: 'created_at'
   };
 
@@ -4830,6 +4858,8 @@ export namespace Prisma {
     total_tickets?: IntFilter<"Event"> | number
     available_tickets?: IntFilter<"Event"> | number
     organizer_id?: StringFilter<"Event"> | string
+    status?: StringFilter<"Event"> | string
+    cancelled_at?: DateTimeNullableFilter<"Event"> | Date | string | null
     created_at?: DateTimeFilter<"Event"> | Date | string
     organizer?: XOR<UserScalarRelationFilter, UserWhereInput>
     bookings?: BookingListRelationFilter
@@ -4845,6 +4875,8 @@ export namespace Prisma {
     total_tickets?: SortOrder
     available_tickets?: SortOrder
     organizer_id?: SortOrder
+    status?: SortOrder
+    cancelled_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     organizer?: UserOrderByWithRelationInput
     bookings?: BookingOrderByRelationAggregateInput
@@ -4863,6 +4895,8 @@ export namespace Prisma {
     total_tickets?: IntFilter<"Event"> | number
     available_tickets?: IntFilter<"Event"> | number
     organizer_id?: StringFilter<"Event"> | string
+    status?: StringFilter<"Event"> | string
+    cancelled_at?: DateTimeNullableFilter<"Event"> | Date | string | null
     created_at?: DateTimeFilter<"Event"> | Date | string
     organizer?: XOR<UserScalarRelationFilter, UserWhereInput>
     bookings?: BookingListRelationFilter
@@ -4878,6 +4912,8 @@ export namespace Prisma {
     total_tickets?: SortOrder
     available_tickets?: SortOrder
     organizer_id?: SortOrder
+    status?: SortOrder
+    cancelled_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     _count?: EventCountOrderByAggregateInput
     _avg?: EventAvgOrderByAggregateInput
@@ -4899,6 +4935,8 @@ export namespace Prisma {
     total_tickets?: IntWithAggregatesFilter<"Event"> | number
     available_tickets?: IntWithAggregatesFilter<"Event"> | number
     organizer_id?: StringWithAggregatesFilter<"Event"> | string
+    status?: StringWithAggregatesFilter<"Event"> | string
+    cancelled_at?: DateTimeNullableWithAggregatesFilter<"Event"> | Date | string | null
     created_at?: DateTimeWithAggregatesFilter<"Event"> | Date | string
   }
 
@@ -5059,6 +5097,8 @@ export namespace Prisma {
     date_time: Date | string
     total_tickets: number
     available_tickets: number
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
     organizer: UserCreateNestedOneWithoutEventsInput
     bookings?: BookingCreateNestedManyWithoutEventInput
@@ -5074,6 +5114,8 @@ export namespace Prisma {
     total_tickets: number
     available_tickets: number
     organizer_id: string
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
     bookings?: BookingUncheckedCreateNestedManyWithoutEventInput
   }
@@ -5087,6 +5129,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneRequiredWithoutEventsNestedInput
     bookings?: BookingUpdateManyWithoutEventNestedInput
@@ -5102,6 +5146,8 @@ export namespace Prisma {
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
     organizer_id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     bookings?: BookingUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -5116,6 +5162,8 @@ export namespace Prisma {
     total_tickets: number
     available_tickets: number
     organizer_id: string
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
   }
 
@@ -5128,6 +5176,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5141,6 +5191,8 @@ export namespace Prisma {
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
     organizer_id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5346,6 +5398,17 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -5366,6 +5429,8 @@ export namespace Prisma {
     total_tickets?: SortOrder
     available_tickets?: SortOrder
     organizer_id?: SortOrder
+    status?: SortOrder
+    cancelled_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -5384,6 +5449,8 @@ export namespace Prisma {
     total_tickets?: SortOrder
     available_tickets?: SortOrder
     organizer_id?: SortOrder
+    status?: SortOrder
+    cancelled_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -5397,6 +5464,8 @@ export namespace Prisma {
     total_tickets?: SortOrder
     available_tickets?: SortOrder
     organizer_id?: SortOrder
+    status?: SortOrder
+    cancelled_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -5437,6 +5506,20 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumBookingStatusFilter<$PrismaModel = never> = {
@@ -5623,6 +5706,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type UserUpdateOneRequiredWithoutEventsNestedInput = {
     create?: XOR<UserCreateWithoutEventsInput, UserUncheckedCreateWithoutEventsInput>
     connectOrCreate?: UserCreateOrConnectWithoutEventsInput
@@ -5772,6 +5859,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5827,6 +5925,20 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumBookingStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.BookingStatus | EnumBookingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
@@ -5853,6 +5965,8 @@ export namespace Prisma {
     date_time: Date | string
     total_tickets: number
     available_tickets: number
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
     bookings?: BookingCreateNestedManyWithoutEventInput
   }
@@ -5866,6 +5980,8 @@ export namespace Prisma {
     date_time: Date | string
     total_tickets: number
     available_tickets: number
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
     bookings?: BookingUncheckedCreateNestedManyWithoutEventInput
   }
@@ -5937,6 +6053,8 @@ export namespace Prisma {
     total_tickets?: IntFilter<"Event"> | number
     available_tickets?: IntFilter<"Event"> | number
     organizer_id?: StringFilter<"Event"> | string
+    status?: StringFilter<"Event"> | string
+    cancelled_at?: DateTimeNullableFilter<"Event"> | Date | string | null
     created_at?: DateTimeFilter<"Event"> | Date | string
   }
 
@@ -6109,6 +6227,8 @@ export namespace Prisma {
     date_time: Date | string
     total_tickets: number
     available_tickets: number
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
     organizer: UserCreateNestedOneWithoutEventsInput
   }
@@ -6123,6 +6243,8 @@ export namespace Prisma {
     total_tickets: number
     available_tickets: number
     organizer_id: string
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
   }
 
@@ -6184,6 +6306,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneRequiredWithoutEventsNestedInput
   }
@@ -6198,6 +6322,8 @@ export namespace Prisma {
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
     organizer_id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6210,6 +6336,8 @@ export namespace Prisma {
     date_time: Date | string
     total_tickets: number
     available_tickets: number
+    status?: string
+    cancelled_at?: Date | string | null
     created_at?: Date | string
   }
 
@@ -6231,6 +6359,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     bookings?: BookingUpdateManyWithoutEventNestedInput
   }
@@ -6244,6 +6374,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     bookings?: BookingUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -6257,6 +6389,8 @@ export namespace Prisma {
     date_time?: DateTimeFieldUpdateOperationsInput | Date | string
     total_tickets?: IntFieldUpdateOperationsInput | number
     available_tickets?: IntFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    cancelled_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
