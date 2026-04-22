@@ -83,15 +83,19 @@ export default function MyEvents() {
                 />
 
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold">{event.title}</h3>
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${event.status === "CANCELLED"
-                        ? "bg-red-100 text-red-600"
-                        : "bg-green-100 text-green-600"
-                      }`}
-                  >
-                    {event.status}
-                  </span>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="min-w-0 flex-1 text-lg font-semibold">
+                      {event.title}
+                    </h3>
+                    <span
+                      className={`shrink-0 inline-flex items-center px-2 py-1 text-xs rounded-full ${event.status === "CANCELLED"
+                          ? "bg-red-100 text-red-600"
+                          : "bg-green-100 text-green-600"
+                        }`}
+                    >
+                      {event.status}
+                    </span>
+                  </div>
                   <p className="text-gray-600 text-sm">
                     {formattedDate} | {formattedTime}
                   </p>

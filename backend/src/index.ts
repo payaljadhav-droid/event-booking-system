@@ -15,7 +15,7 @@ const app = new Hono<AppEnv>();
 app.use(
   "*",
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -26,20 +26,18 @@ app.use(
   "*",
   sessionMiddleware({
     store: new MemoryStore(),
-    encryptionKey: "this-is-a-very-long-secret-key-at-least-32-chars",
+    encryptionKey: process.env.SESSION_SECRET!,
 
     cookieOptions: {
       maxAge: 60 * 60, 
       httpOnly: true,
-      secure: false, 
+      secure: process.env.NODE_ENV === "production", 
     },
   }),
   
 );
 
 app.get("/", async (c) => {
-  const allUsers = await prisma.user.findMany();
-  console.log("USERS: ", allUsers);
   return c.text("Server running");
 });
 

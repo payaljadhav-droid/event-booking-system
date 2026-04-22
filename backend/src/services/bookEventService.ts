@@ -150,13 +150,10 @@ export const myBookings = async (c: Context<AppEnv>) => {
       200
     );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Bookings not found";
-
     return c.json(
       {
         status: "fail",
-        error: { message },
+        error: { message: "Bookings not found" },
       },
       500
     );

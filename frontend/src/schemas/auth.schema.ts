@@ -7,6 +7,15 @@ export const loginSchema = z
   })
   .strict();
 
+export const registerSchema = z
+  .object({
+    name: z.string().min(2, "Name is too short"),
+    email: z.email("Invalid email"),
+    password: z.string().min(6, "Password must be at least 6 chars"),
+    role: z.enum(["user", "organizer"], { message: "Role missing" }),
+  })
+  .strict();
+
 export const loginResponseSchema = z
   .object({
     data: z

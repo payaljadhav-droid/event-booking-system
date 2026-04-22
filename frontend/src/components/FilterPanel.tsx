@@ -11,7 +11,7 @@ export default function FilterPanel({setFilter, location, setLocation}:Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [locationOpen, setLocationOpen] = useState<boolean>(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = (user.role || "").toUpperCase();
+  const role = (user.role || "").toString().toLowerCase();
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function FilterPanel({setFilter, location, setLocation}:Props) {
             </div>
           )}
         </div>
-        {role == "ORGANIZER" ? (
+        {role === "organizer" ? (
           <div className="mt-6 pt-4 border-t border-gray-100">
             <a
               href="/organizer/events/new"

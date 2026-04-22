@@ -14,9 +14,6 @@ const getErrorMessage = (error: unknown) => {
   if (error instanceof z.ZodError) {
     return error.issues[0]?.message;
   }
-  if (error instanceof Error) {
-    return error.message;
-  }
   return "Something went wrong";
 };
 
@@ -114,7 +111,6 @@ export const myEvents = async (c: Context<AppEnv>) => {
 
 export const getEventById = async (c: Context<AppEnv>) => {
   try {
-    // ✅ validate param
     const { id } = idParamSchema.parse({
       id: c.req.param("id"),
     });

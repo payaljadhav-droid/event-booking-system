@@ -116,7 +116,7 @@ export const loginUser = async (c: Context<AppEnv>) => {
       return c.json(
         {
           status: "fail",
-          error: { message: "User not found" },
+          error: { message: "Invalid credentials" },
         },
         400,
       );

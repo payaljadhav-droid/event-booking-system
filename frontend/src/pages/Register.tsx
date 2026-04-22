@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerSchema } from "../schemas/auth.schema";
 
 export default function Login() {
   const [name, setName] = useState("");
@@ -12,14 +13,18 @@ export default function Login() {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    if (!name && !email && !password && !role) return;
+    const parsed = registerSchema.safeParse({ name, email, password, role });
+    if (!parsed.success) {
+      alert(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
     
       try {
         const res = await fetch("http://localhost:3000/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include", 
-          body: JSON.stringify({ name, email, password, role }),
+          body: JSON.stringify(parsed.data),
         });
     
         const data = await res.json();

@@ -8,6 +8,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import MyEvent from "./pages/MyEvent";
 import RedirectIfAuth from "./routes/RedirectIfAuth";
 import RequireAuth from "./routes/RequireAuth";
+import RequireRole from "./routes/RequireRole";
 
 function App() {
   return (
@@ -23,9 +24,15 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/bookings/me" element={<MyBookingPage />} />
-          <Route path="/organizer/events/new" element={<CreateEventPage mode="create" />} />
-          <Route path="/organizer/events" element={<MyEvent />} />
-          <Route path="/events/:id/edit" element={<CreateEventPage mode="edit" />} />
+
+          <Route element={<RequireRole role="organizer" />}>
+            <Route
+              path="/organizer/events/new"
+              element={<CreateEventPage mode="create" />}
+            />
+            <Route path="/organizer/events" element={<MyEvent />} />
+            <Route path="/events/:id/edit" element={<CreateEventPage mode="edit" />} />
+          </Route>
         </Route>
       </Routes>
     </>
