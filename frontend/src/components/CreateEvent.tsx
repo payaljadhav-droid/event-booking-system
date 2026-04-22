@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  createOrUpdateEventSchema,
+  getEventResponseSchema,
+} from "../schemas/event.schema";
+import { aiDraftResponseSchema, aiHintSchema } from "../schemas/ai.schema";
 
 type Props = {
   mode?: "create" | "edit";
@@ -11,6 +16,10 @@ export default function CreateEvent({ mode = "create" }: Props) {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const [showAiStep, setShowAiStep] = useState(mode === "create");
+  const [hint, setHint] = useState("");
+  const [hintError, setHintError] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -28,6 +37,8 @@ export default function CreateEvent({ mode = "create" }: Props) {
         credentials: "include",
       });
       const json = await res.json();
+      const parsed = getEventResponseSchema.safeParse(json);
+      if (parsed.success) return parsed.data.data.event;
       return json.data?.event ?? json;
     },
     enabled: mode === "edit" && !!id,
@@ -59,6 +70,43 @@ export default function CreateEvent({ mode = "create" }: Props) {
     }
   }, [data]);
 
+  const aiDraftMutation = useMutation({
+    mutationFn: async () => {
+      const parsedHint = aiHintSchema.safeParse({ hint });
+      if (!parsedHint.success) {
+        throw new Error(parsedHint.error.issues[0]?.message ?? "Invalid hint");
+      }
+
+      const res = await fetch("http://localhost:3000/api/ai/event-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(parsedHint.data),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error?.message || json?.message || "AI generation failed");
+
+      const parsed = aiDraftResponseSchema.safeParse(json);
+      if (!parsed.success) throw new Error("AI response was not in expected format");
+
+      return parsed.data.data.draft;
+    },
+    onSuccess: (draft) => {
+      setTitle(draft.title ?? "");
+      setDescription(draft.description ?? "");
+      setEventLocation(draft.location ?? "");
+      setDate(draft.date ?? "");
+      setTime(draft.time ?? "");
+      setTotalTickets(String(draft.total_tickets ?? ""));
+      setHintError(null);
+      setShowAiStep(false);
+    },
+    onError: (err: any) => {
+      setHintError(err?.message ?? "AI generation failed");
+    },
+  });
+
   
   const mutation = useMutation({
     mutationFn: async () => {
@@ -69,19 +117,24 @@ export default function CreateEvent({ mode = "create" }: Props) {
 
       const method = mode === "edit" ? "PUT" : "POST";
 
+      const parsedInput = createOrUpdateEventSchema.safeParse({
+        title,
+        description,
+        location: eventLocation,
+        date,
+        time,
+        total_tickets,
+        image_url: image,
+      });
+      if (!parsedInput.success) {
+        throw new Error(parsedInput.error.issues[0]?.message ?? "Invalid input");
+      }
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          title,
-          description,
-          location: eventLocation,
-          date,
-          time,
-          total_tickets: Number(total_tickets),
-          image_url: image,
-        }),
+        body: JSON.stringify(parsedInput.data),
       });
 
       const data = await res.json();
@@ -108,11 +161,6 @@ export default function CreateEvent({ mode = "create" }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !description || !eventLocation || !date || !time || !total_tickets) {
-      alert("Please fill in all fields");
-      return;
-    }
-
     mutation.mutate();
   };
 
@@ -122,82 +170,131 @@ export default function CreateEvent({ mode = "create" }: Props) {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {mode === "edit" ? "Edit Event" : "Create Your Event"}
-      </h2>
+    <>
+      {mode === "create" && showAiStep ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-bold">Generate event details with AI</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Enter event idea or hint (e.g. Holi party, Summer fest, DJ night, Tech meetup)
+            </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="mt-4">
+              <input
+                type="text"
+                value={hint}
+                onChange={(e) => {
+                  setHint(e.target.value);
+                  setHintError(null);
+                }}
+                placeholder="Type your hint..."
+                className="w-full rounded-lg border p-2"
+              />
+              {hintError ? <p className="mt-2 text-sm text-red-600">{hintError}</p> : null}
+            </div>
 
-        <input
-          type="text"
-          placeholder="Event name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className="rounded-lg border px-4 py-2"
+                onClick={() => {
+                  setHintError(null);
+                  setShowAiStep(false);
+                }}
+                disabled={aiDraftMutation.isPending}
+              >
+                Skip and fill manually
+              </button>
+              <button
+                type="button"
+                className={`rounded-lg px-4 py-2 text-white ${aiDraftMutation.isPending ? "bg-gray-400" : "bg-blue-600"
+                  }`}
+                onClick={() => aiDraftMutation.mutate()}
+                disabled={aiDraftMutation.isPending}
+              >
+                {aiDraftMutation.isPending ? "Generating..." : "Generate with AI"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {mode === "edit" ? "Edit Event" : "Create Your Event"}
+        </h2>
 
-        <input
-          type="text"
-          placeholder="Location"
-          value={eventLocation}
-          onChange={(e) => setEventLocation(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Event name"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
 
-        <input
-          type="text"
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+          <textarea
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
 
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+          <input
+            type="text"
+            placeholder="Location"
+            value={eventLocation}
+            onChange={(e) => setEventLocation(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
 
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
+          <input
+            type="text"
+            placeholder="Image URL"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
 
-        <input
-          type="number"
-          placeholder="Total tickets"
-          value={total_tickets}
-          onChange={(e) => setTotalTickets(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-          min={1}
-        />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
 
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className={`w-full ${mutation.isPending ? "bg-gray-400" : "bg-blue-500"
-            } text-white py-2 rounded-lg`}
-        >
-          {mutation.isPending
-            ? mode === "edit"
-              ? "Updating..."
-              : "Creating..."
-            : mode === "edit"
-              ? "Save Updates"
-              : "Create Event"}
-        </button>
-      </form>
-    </div>
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+          />
+
+          <input
+            type="number"
+            placeholder="Total tickets"
+            value={total_tickets}
+            onChange={(e) => setTotalTickets(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            min={1}
+          />
+
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className={`w-full ${mutation.isPending ? "bg-gray-400" : "bg-blue-500"
+              } text-white py-2 rounded-lg`}
+          >
+            {mutation.isPending
+              ? mode === "edit"
+                ? "Updating..."
+                : "Creating..."
+              : mode === "edit"
+                ? "Save Updates"
+                : "Create Event"}
+          </button>
+        </form>
+      </div>
+    </>
   );
 }

@@ -1,30 +1,42 @@
 import { Context } from "hono";
 import { prisma } from "../db/prisma";
 import { AppEnv } from "../services/authService";
+import { z } from "zod";
+import { eventUpsertSchema } from "../schemas/event.schema";
+
+const updateEventSchema = eventUpsertSchema.partial();
+
+const idParamSchema = z.object({
+  id: z.string().min(1, "Invalid id"),
+});
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof z.ZodError) {
+    return error.issues[0]?.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "Something went wrong";
+};
 
 export const createEvent = async (c: Context<AppEnv>) => {
   try {
-    console.log("create route hits!!!");
-    const body = await c.req.json();
-    const { title, description, image_url, location, date, time, total_tickets } = body;
-
     const user = c.get("user");
 
     if (!user) {
-      return c.json({
-        status: "fail",
-        error: { message: "Unauthorized" },
-      }, 401);
+      return c.json(
+        { status: "fail", error: { message: "Unauthorized" } },
+        401
+      );
     }
+
+    const body = eventUpsertSchema.parse(await c.req.json());
+
+    const { title, description, image_url, location, date, time, total_tickets } =
+      body;
 
     const date_time = new Date(`${date}T${time}`);
-
-    if (!title || !date_time || !total_tickets) {
-      return c.json({
-        status: "fail",
-        error: { message: "Missing required fields" },
-      }, 400);
-    }
 
     const event = await prisma.event.create({
       data: {
@@ -32,56 +44,44 @@ export const createEvent = async (c: Context<AppEnv>) => {
         description,
         image_url,
         location,
-        date_time: date_time,
+        date_time,
         total_tickets,
         available_tickets: total_tickets,
         organizer_id: user.id,
       },
     });
 
-    console.log(event);
-
-    return c.json({
-      status: "success",
-      data: {
-        event,
-        message: "Event created successfully",
+    return c.json(
+      {
+        status: "success",
+        data: { event, message: "Event created successfully" },
+        error: null,
       },
-      error: null,
-    }, 201);
-
+      201
+    );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Something went wrong";
-
-    console.log("ERROR:", message);
-
-    return c.json({
-      status: "fail",
-      error: { message },
-    }, 500);
+    return c.json(
+      { status: "fail", error: { message: getErrorMessage(error) } },
+      400
+    );
   }
 };
 
 export const getAllEvents = async (c: Context<AppEnv>) => {
   try {
     const events = await prisma.event.findMany({
-      where: {
-        status: "ACTIVE",
-      },
+      where: { status: "ACTIVE" },
     });
 
-    return c.json({
-      status: "success",
-      data: { events },
-      error: null,
-    }, 200);
-
-  } catch (error) {
-    return c.json({
-      status: "fail",
-      error: { message: "Events not found" },
-    }, 500);
+    return c.json(
+      { status: "success", data: { events }, error: null },
+      200
+    );
+  } catch {
+    return c.json(
+      { status: "fail", error: { message: "Events not found" } },
+      500
+    );
   }
 };
 
@@ -90,138 +90,114 @@ export const myEvents = async (c: Context<AppEnv>) => {
     const user = c.get("user");
 
     if (!user) {
-      return c.json({
-        status: "fail",
-        error: { message: "Unauthorized" },
-      }, 401);
+      return c.json(
+        { status: "fail", error: { message: "Unauthorized" } },
+        401
+      );
     }
 
     const events = await prisma.event.findMany({
-      where: {
-        organizer_id: user.id,
-      },
+      where: { organizer_id: user.id },
     });
 
-    return c.json({
-      status: "success",
-      data: { events },
-      error: null,
-    }, 200);
-
-  } catch (error) {
-    return c.json({
-      status: "fail",
-      error: { message: "Events not found" },
-    }, 500);
+    return c.json(
+      { status: "success", data: { events }, error: null },
+      200
+    );
+  } catch {
+    return c.json(
+      { status: "fail", error: { message: "Events not found" } },
+      500
+    );
   }
 };
 
 export const getEventById = async (c: Context<AppEnv>) => {
   try {
-    const id = c.req.param("id");
+    // ✅ validate param
+    const { id } = idParamSchema.parse({
+      id: c.req.param("id"),
+    });
 
     const event = await prisma.event.findUnique({
-      where: {
-        id: String(id),
-      },
+      where: { id },
     });
 
     if (!event) {
-      return c.json({
-        status: "fail",
-        error: { message: "Event not found" },
-      }, 404);
+      return c.json(
+        { status: "fail", error: { message: "Event not found" } },
+        404
+      );
     }
 
-    return c.json({
-      status: "success",
-      data: { event },
-      error: null,
-    }, 200);
-
+    return c.json(
+      { status: "success", data: { event }, error: null },
+      200
+    );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Something went wrong";
-
-    return c.json({
-      status: "fail",
-      error: { message },
-    }, 500);
+    return c.json(
+      { status: "fail", error: { message: getErrorMessage(error) } },
+      400
+    );
   }
 };
 
 export const updateEvent = async (c: Context<AppEnv>) => {
   try {
-    const id = c.req.param("id");
+    const { id } = idParamSchema.parse({
+      id: c.req.param("id"),
+    });
+
     const user = c.get("user");
 
     if (!user) {
       return c.json(
-        {
-          status: "fail",
-          error: { message: "Unauthorized" },
-        },
+        { status: "fail", error: { message: "Unauthorized" } },
         401
       );
     }
 
     const existing = await prisma.event.findUnique({
-      where: { id: String(id) },
+      where: { id },
     });
 
     if (!existing) {
       return c.json(
-        {
-          status: "fail",
-          error: { message: "Event not found" },
-        },
+        { status: "fail", error: { message: "Event not found" } },
         404
       );
     }
 
     if (existing.organizer_id !== user.id) {
       return c.json(
-        {
-          status: "fail",
-          error: { message: "Forbidden" },
-        },
+        { status: "fail", error: { message: "Forbidden" } },
         403
       );
     }
 
-    const body = await c.req.json();
-    const { title, description, image_url, location, date, time, total_tickets } =
-      body;
+    const body = updateEventSchema.parse(await c.req.json());
 
     const nextDateTime =
-      date && time ? new Date(`${date}T${time}`) : existing.date_time;
+      body.date && body.time
+        ? new Date(`${body.date}T${body.time}`)
+        : existing.date_time;
 
     const nextTotal =
-      typeof total_tickets === "number"
-        ? total_tickets
-        : Number(total_tickets);
-
-    if (!title || !nextDateTime || !nextTotal) {
-      return c.json(
-        {
-          status: "fail",
-          error: { message: "Missing required fields" },
-        },
-        400
-      );
-    }
+      body.total_tickets ?? existing.total_tickets;
 
     const alreadyBooked =
-      (existing.total_tickets ?? 0) - (existing.available_tickets ?? 0);
-    const nextAvailable = Math.max(nextTotal - alreadyBooked, 0);
+      (existing.total_tickets ?? 0) -
+      (existing.available_tickets ?? 0);
+
+    const nextAvailable = Math.max(
+      nextTotal - alreadyBooked,
+      0
+    );
 
     const event = await prisma.event.update({
-      where: { id: String(id) },
+      where: { id },
       data: {
-        title,
-        description,
-        image_url,
-        location,
+        ...body,
         date_time: nextDateTime,
         total_tickets: nextTotal,
         available_tickets: nextAvailable,
@@ -231,92 +207,82 @@ export const updateEvent = async (c: Context<AppEnv>) => {
     return c.json(
       {
         status: "success",
-        data: {
-          event,
-          message: "Event updated successfully",
-        },
+        data: { event, message: "Event updated successfully" },
         error: null,
       },
       200
     );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Something went wrong";
-
     return c.json(
-      {
-        status: "fail",
-        error: { message },
-      },
-      500
+      { status: "fail", error: { message: getErrorMessage(error) } },
+      400
     );
   }
 };
 
 export const cancelEvent = async (c: Context<AppEnv>) => {
-  const eventId = c.req.param("id");
-  const user = c.get("user");
+  try {
+    const { id } = idParamSchema.parse({
+      id: c.req.param("id"),
+    });
 
-  if (!user) {
-    return c.json(
-      {
-        status: "fail",
-        error: { message: "Unauthorized" },
-      },
-      401
-    );
-  }
+    const user = c.get("user");
 
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-  });
+    if (!user) {
+      return c.json(
+        { status: "fail", error: { message: "Unauthorized" } },
+        401
+      );
+    }
 
-  if (!event) {
-    return c.json(
-      {
-        status: "fail",
-        error: { message: "Event not found" },
-      },
-      404
-    );
-  }
+    const event = await prisma.event.findUnique({
+      where: { id },
+    });
 
-  if (event.status === "CANCELLED") {
-    return c.json({
-      status: "fail",
-      error: { message: "Event is already cancelled" }
-    },
-    400
-    );
-  }
+    if (!event) {
+      return c.json(
+        { status: "fail", error: { message: "Event not found" } },
+        404
+      );
+    }
 
-  if (event.organizer_id !== user.id) {
-    return c.json(
-      {
-        status: "fail",
-        error: { message: "Not allowed" },
-      },
-      403
-    );
-  }
+    if (event.status === "CANCELLED") {
+      return c.json(
+        {
+          status: "fail",
+          error: { message: "Event is already cancelled" },
+        },
+        400
+      );
+    }
 
-  const updated = await prisma.event.update({
-    where: { id: eventId },
-    data: {
-      status: "CANCELLED",
-      cancelled_at: new Date(),
-    },
-  });
+    if (event.organizer_id !== user.id) {
+      return c.json(
+        { status: "fail", error: { message: "Not allowed" } },
+        403
+      );
+    }
 
-  return c.json(
-    {
-      status: "success",
+    const updated = await prisma.event.update({
+      where: { id },
       data: {
-        message: "Event cancelled",
-        event: updated,
+        status: "CANCELLED",
+        cancelled_at: new Date(),
       },
-      error: null,
-    },
-    200
-  );
+    });
+
+    return c.json(
+      {
+        status: "success",
+        data: { message: "Event cancelled", event: updated },
+        error: null,
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      { status: "fail", error: { message: getErrorMessage(error) } },
+      400
+    );
+  }
 };

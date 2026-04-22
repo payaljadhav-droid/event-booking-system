@@ -8,6 +8,7 @@ import { AppEnv } from "./services/authService";
 import eventRoutes from "./routes/eventRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import { cors } from "hono/cors";
+import aiRoutes from "./routes/aiRoutes";
 
 const app = new Hono<AppEnv>();
 
@@ -50,6 +51,7 @@ app.get("/users", async (c) => {
 app.route("/api/auth", authRoutes);
 app.route("/api/events", eventRoutes);
 app.route("/api/bookings", bookingRoutes);
+app.route("/api/ai", aiRoutes);
 
 serve(
   {

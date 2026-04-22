@@ -1,25 +1,28 @@
 import { Context } from "hono";
 import { prisma } from "../db/prisma";
 import { AppEnv } from "../services/authService";
+import {cancelBookingSchema} from "../schemas/booking.schema";
 
 export const cancelBooking = async (c: Context<AppEnv>) => {
   try {
     const body = await c.req.json();
-    const { booking_id } = body;
 
-    if (!booking_id) {
+    const parsed = cancelBookingSchema.safeParse(body);
+     
+    if(!parsed.success){
       return c.json(
         {
-          status: "fail",
+          status:"fail",
           error: {
-            message: "Booking ID required",
-            field: "booking_id",
+            message:"Validation failed",
+            details:parsed.error.flatten(),
           },
         },
         400
       );
     }
-
+    
+    const {booking_id} = parsed.data;
     const userId = c.get("user")?.id;
 
     if (!userId) {

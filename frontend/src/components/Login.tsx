@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginResponseSchema, loginSchema } from "../schemas/auth.schema";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,8 +10,9 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter email and password");
+    const parsedInput = loginSchema.safeParse({ email, password });
+    if (!parsedInput.success) {
+      alert(parsedInput.error.issues[0]?.message ?? "Invalid input");
       return;
     }
 
@@ -19,7 +21,7 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(parsedInput.data),
       });
 
       const data = await res.json();
@@ -30,14 +32,14 @@ export default function Login() {
         return;
       }
 
-      const user = data?.data?.user;
-
-      if (!user || !user.role) {
-        console.error("User role missing in response:", data);
-        alert("Login failed: invalid user data");
+      const parsedRes = loginResponseSchema.safeParse(data);
+      if (!parsedRes.success) {
+        console.error("Invalid login response:", parsedRes.error.issues, data);
+        alert("Login failed: invalid server response");
         return;
       }
 
+      const user = parsedRes.data.data.user;
       const role = (user.role || "").toUpperCase();
 
       localStorage.setItem(

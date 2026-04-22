@@ -1,34 +1,28 @@
 import { Context } from "hono";
 import { prisma } from "../db/prisma";
 import { AppEnv } from "../services/authService";
+import { bookTicketSchema } from "../schemas/booking.schema";
 
 export const bookTicket = async (c: Context<AppEnv>) => {
   try {
-    console.log("booking route hits");
     const body = await c.req.json();
 
-    const event_id = body.event_id;
-    const tickets_booked = Number(body.tickets_booked);
+    const parsed = bookTicketSchema.safeParse(body);
 
-    if (!event_id || !tickets_booked) {
+    if (!parsed.success) {
       return c.json(
         {
           status: "fail",
-          error: { message: "missing input" },
+          error: {
+            message: "Validation failed",
+            details: parsed.error.flatten(),
+          },
         },
-        400,
+        400
       );
     }
 
-    if (isNaN(tickets_booked)) {
-      return c.json(
-        {
-          status: "fail",
-          error: { message: "invalid ticket number" },
-        },
-        400,
-      );
-    }
+    const { event_id, tickets_booked } = parsed.data;
 
     const userId = c.get("user")?.id;
 
@@ -38,17 +32,13 @@ export const bookTicket = async (c: Context<AppEnv>) => {
           status: "fail",
           error: { message: "User not logged in" },
         },
-        401,
+        401
       );
     }
 
     const event = await prisma.event.findUnique({
-      where: {
-        id: event_id,
-      },
+      where: { id: event_id },
     });
-
-    console.log(event);
 
     if (!event) {
       return c.json(
@@ -56,7 +46,7 @@ export const bookTicket = async (c: Context<AppEnv>) => {
           status: "fail",
           error: { message: "event not found" },
         },
-        404,
+        404
       );
     }
 
@@ -70,11 +60,7 @@ export const bookTicket = async (c: Context<AppEnv>) => {
       );
     }
 
-    let availableTickets = event.available_tickets;
-
-    if (availableTickets == null) {
-      availableTickets = event.total_tickets;
-    }
+    let availableTickets = event.available_tickets ?? event.total_tickets;
 
     if (typeof availableTickets !== "number") {
       return c.json(
@@ -82,17 +68,7 @@ export const bookTicket = async (c: Context<AppEnv>) => {
           status: "fail",
           error: { message: "Event tickets not initialized properly" },
         },
-        500,
-      );
-    }
-
-    if (tickets_booked <= 0) {
-      return c.json(
-        {
-          status: "fail",
-          error: { message: "invalid ticket count" },
-        },
-        400,
+        500
       );
     }
 
@@ -102,14 +78,12 @@ export const bookTicket = async (c: Context<AppEnv>) => {
           status: "fail",
           error: { message: "not enough tickets to book" },
         },
-        400,
+        400
       );
     }
 
     const updatedEvent = await prisma.event.update({
-      where: {
-        id: event_id,
-      },
+      where: { id: event_id },
       data: {
         available_tickets: availableTickets - tickets_booked,
       },
@@ -118,7 +92,7 @@ export const bookTicket = async (c: Context<AppEnv>) => {
     const booking = await prisma.booking.create({
       data: {
         user_id: userId,
-        event_id: event_id,
+        event_id,
         tickets_booked,
       },
     });
@@ -132,7 +106,7 @@ export const bookTicket = async (c: Context<AppEnv>) => {
           remaining_tickets: updatedEvent.available_tickets,
         },
       },
-      201,
+      201
     );
   } catch (error) {
     console.log("Error occurs:", error);
@@ -140,11 +114,9 @@ export const bookTicket = async (c: Context<AppEnv>) => {
     return c.json(
       {
         status: "fail",
-        error: {
-          message: "booking failed",
-        },
+        error: { message: "booking failed" },
       },
-      500,
+      500
     );
   }
 };
@@ -157,38 +129,36 @@ export const myBookings = async (c: Context<AppEnv>) => {
       return c.json(
         {
           status: "fail",
-          error: { message: "User not logged in" },
+          error: { message: "Unauthorized" },
         },
-        401,
+        401
       );
     }
 
     const bookings = await prisma.booking.findMany({
-      where: {
-        user_id: userId,
-      },
-      include: {
-        event: true,
-      },
+      where: { user_id: userId },
+      include: { event: true },
+      orderBy: { created_at: "desc" },
     });
 
-    console.log("Bookings:", bookings);
-
-    return c.json({
-      status: "success",
-      data: {
-        bookings,
+    return c.json(
+      {
+        status: "success",
+        data: { bookings },
+        error: null,
       },
-    });
+      200
+    );
   } catch (error) {
-    console.log("MY BOOKINGS ERROR:", error);
+    const message =
+      error instanceof Error ? error.message : "Bookings not found";
 
     return c.json(
       {
         status: "fail",
-        error: { message: "bookings not found" },
+        error: { message },
       },
-      500,
+      500
     );
   }
 };
