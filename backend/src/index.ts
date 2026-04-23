@@ -15,7 +15,7 @@ const app = new Hono<AppEnv>();
 app.use(
   "*",
   cors({
-    origin: "http://localhost:5174",
+    origin: "https://event-booking-system-payaljadhav-droids-projects.vercel.app/",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
