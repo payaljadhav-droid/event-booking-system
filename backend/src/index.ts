@@ -12,9 +12,7 @@ import aiRoutes from "./routes/aiRoutes";
 
 const app = new Hono<AppEnv>();
 
-app.use(
-  "*",
-  cors({
+app.use(cors({
     origin: ["https://event-booking-system-gamma.vercel.app"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
