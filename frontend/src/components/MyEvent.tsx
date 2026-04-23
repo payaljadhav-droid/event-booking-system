@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { apiBaseUrl } from "../config/api";
 
 type Event = {
   id: string;
@@ -18,7 +19,7 @@ export default function MyEvents() {
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ["myEvents"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/events/mine", {
+      const res = await fetch(`${apiBaseUrl}/api/events/mine`, {
         credentials: "include",
       });
 
@@ -34,7 +35,7 @@ export default function MyEvents() {
     const confirmed = window.confirm("Cancel this event?");
     if (!confirmed) return;
 
-    const res = await fetch(`http://localhost:3000/api/events/${id}/cancel`, {
+    const res = await fetch(`${apiBaseUrl}/api/events/${id}/cancel`, {
       method: "PUT",
       credentials: "include",
     });

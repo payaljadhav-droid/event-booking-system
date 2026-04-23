@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerSchema } from "../schemas/auth.schema";
+import { apiBaseUrl } from "../config/api";
 
 export default function Login() {
   const [name, setName] = useState("");
@@ -20,7 +21,7 @@ export default function Login() {
     }
     
       try {
-        const res = await fetch("http://localhost:3000/api/auth/register", {
+        const res = await fetch(`${apiBaseUrl}/api/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include", 

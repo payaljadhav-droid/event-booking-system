@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiBaseUrl } from "../config/api";
 
 type Booking = {
   id: string;
@@ -18,7 +19,7 @@ export default function MyBookings() {
   const { data: bookings, isLoading, error } = useQuery<Booking[]>({
     queryKey: ["myBookings"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/bookings/mine", {
+      const res = await fetch(`${apiBaseUrl}/api/bookings/mine`, {
         credentials: "include",
       });
 
@@ -29,7 +30,7 @@ export default function MyBookings() {
 
   const cancelMutation = useMutation({
     mutationFn: async (booking_id: string) => {
-      const res = await fetch("http://localhost:3000/api/bookings/cancellation", {
+      const res = await fetch(`${apiBaseUrl}/api/bookings/cancellation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

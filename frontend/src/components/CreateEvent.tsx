@@ -6,6 +6,7 @@ import {
   getEventResponseSchema,
 } from "../schemas/event.schema";
 import { aiDraftResponseSchema, aiHintSchema } from "../schemas/ai.schema";
+import { apiBaseUrl } from "../config/api";
 
 type Props = {
   mode?: "create" | "edit";
@@ -33,7 +34,7 @@ export default function CreateEvent({ mode = "create" }: Props) {
   const { data, isLoading } = useQuery({
     queryKey: ["event", id],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:3000/api/events/${id}`, {
+      const res = await fetch(`${apiBaseUrl}/api/events/${id}`, {
         credentials: "include",
       });
       const json = await res.json();
@@ -77,7 +78,7 @@ export default function CreateEvent({ mode = "create" }: Props) {
         throw new Error(parsedHint.error.issues[0]?.message ?? "Invalid hint");
       }
 
-      const res = await fetch("http://localhost:3000/api/ai/event-draft", {
+      const res = await fetch(`${apiBaseUrl}/api/ai/event-draft`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -112,8 +113,8 @@ export default function CreateEvent({ mode = "create" }: Props) {
     mutationFn: async () => {
       const url =
         mode === "edit"
-          ? `http://localhost:3000/api/events/${id}`
-          : "http://localhost:3000/api/events";
+          ? `${apiBaseUrl}/api/events/${id}`
+          : `${apiBaseUrl}/api/events`;
 
       const method = mode === "edit" ? "PUT" : "POST";
 

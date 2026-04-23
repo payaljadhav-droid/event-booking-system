@@ -3,6 +3,7 @@ import FilterPanel from "../components/FilterPanel";
 import EventCard from "../components/EventCards";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { apiBaseUrl } from "../config/api";
 
 type Event = {
   id: string;
@@ -20,7 +21,7 @@ export default function UserDashboard() {
   const { data: events = [], isLoading, error } = useQuery<Event[]>({
     queryKey: ["events"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/events");
+      const res = await fetch(`${apiBaseUrl}/api/events`);
       const json = await res.json();
       return json.data.events;
     },

@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import { apiBaseUrl } from "../config/api";
 
 export default function EventDetailsPage() {
   const [search, setSearch] = useState("");
@@ -15,7 +16,7 @@ export default function EventDetailsPage() {
   const { data: event, isLoading, error } = useQuery({
     queryKey: ["event", id],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:3000/api/events/${id}`);
+      const res = await fetch(`${apiBaseUrl}/api/events/${id}`);
       const json = await res.json();
       return json.data.event;
     },
