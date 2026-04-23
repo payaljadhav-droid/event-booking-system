@@ -12,8 +12,16 @@ import aiRoutes from "./routes/aiRoutes";
 
 const app = new Hono<AppEnv>();
 
-app.use(cors({
-    origin: ["https://event-booking-system-gamma.vercel.app"],
+const allowedOrigins = (
+  process.env.CORS_ORIGINS ?? "https://event-booking-system-gamma.vercel.app"
+)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -29,7 +37,8 @@ app.use(
     cookieOptions: {
       maxAge: 60 * 60, 
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   }),
   
